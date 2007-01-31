@@ -74,6 +74,7 @@ sub normalizePath {
   } else {
     $file =~ s|^/||;
   }
+  $file =~ s|^\./||;
   return $file;
 }
 
