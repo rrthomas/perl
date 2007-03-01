@@ -29,7 +29,8 @@ use vars qw(%Macros);
 sub doMacro {
   my ($macro, $arg) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
-  map { s/&#(\pN+);/chr($1)/ge; $_ } @arg;
+  # FIXME: The next line is Smut/DarkGlass-specific
+  map { s/&#(\pN+);/chr($1)/ge; $_ } @arg; # Turn entities into characters
   return $Macros{$macro}(@arg) if $Macros{$macro};
   $macro =~ s/^(.)/\u$1/; # Convert unknown $macro to $Macro
   my $ret = "\$$macro";
@@ -41,7 +42,7 @@ sub doMacros {
   my ($text) = shift;
   %Macros = %{shift()};
   1 while (($text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1)/ge) || # macros without arguments
-           ($text =~ s/\$([[:lower:]]+)(?:{((?:(?!(?<!\\)[{}]).)*)(?<!\\)})/doMacro($1, $2)/ge)); # macros with arguments
+           ($text =~ s/\$([[:lower:]]+){((?:(?!(?<!\\)[{}])).*)(?<!\\)}/doMacro($1, $2)/ge)); # macros with arguments
   return $text;
 }
 
