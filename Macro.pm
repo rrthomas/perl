@@ -42,7 +42,7 @@ sub doMacros {
   my ($text) = shift;
   %Macros = %{shift()};
   1 while (($text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1)/ge) || # macros without arguments
-           ($text =~ s/\$([[:lower:]]+){((?:(?!(?<!\\)[{}])).*)(?<!\\)}/doMacro($1, $2)/ge)); # macros with arguments
+           ($text =~ s/\$([[:lower:]]+){((?:(?!(?<!\\)[{}])).*?)(?<!\\)}/doMacro($1, $2)/ge)); # macros with arguments
   return $text;
 }
 
