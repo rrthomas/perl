@@ -90,7 +90,7 @@ sub readFile {
     binmode STDIN, $enc or return;
     open FILE, "-" or return;
   }
-  my $text = do { local $/, <FILE> };
+  my $text = do {local $/, <FILE>};
   close FILE;
   return $text;
 }
@@ -121,7 +121,7 @@ sub writeText {
 sub getMimeType {
   my ($file) = @_;
   open(READER, "-|", "mimetype", $file);
-  my $mimetype = do { local $/, <READER> };
+  my $mimetype = do {local $/, <READER>};
   chomp $mimetype;
   return $mimetype;
 }
