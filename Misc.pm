@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2006 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2007 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -11,6 +11,7 @@ package RRT::Misc;
 use strict;
 use warnings;
 
+use Perl6::Slurp;
 use POSIX 'floor';
 use File::Basename;
 use IPC::Open2;
@@ -22,8 +23,7 @@ BEGIN {
   @ISA = qw(Exporter);
   @EXPORT = qw(&untaint &mtime &touch &which
                &cleanPath &normalizePath
-               &readFile &readText &writeFile
-               &getMimeType &pipe2 &numberToSI);
+               &pipe2 &getMimeType &numberToSI);
 }
 our @EXPORT_OK;
 
@@ -78,54 +78,6 @@ sub normalizePath {
   return $file;
 }
 
-# Read the given file (or stdin if name is `-') and return its contents
-# An undefined value is returned if the file can't be opened or read
-sub readFile {
-  my ($file, $enc) = @_;
-  $enc ||= "";
-  if ($file ne "-") {
-    return if !cleanPath($file);
-    open FILE, "<" . $enc, $file or return;
-  } else {
-    binmode STDIN, $enc or return;
-    open FILE, "-" or return;
-  }
-  my $text = do {local $/, <FILE>};
-  close FILE;
-  return $text;
-}
-
-# Read a file as UTF-8
-sub readText {
-  my ($file) = @_;
-  return readFile($file, ":utf8");
-}
-
-# No error is raised if the file can't be written
-sub writeFile {
-  my ($file, $cont, $enc) = @_;
-  $enc ||= "";
-  return if !cleanPath($file);
-  open FILE, ">" . $enc, $file;
-  print FILE $cont;
-  close FILE;
-}
-
-# Write a file as UTF-8
-sub writeText {
-  my ($file, $cont) = @_;
-  return writeFile($file, $cont, ":utf8");
-}
-
-# Return the MIME type of the given file
-sub getMimeType {
-  my ($file) = @_;
-  open(READER, "-|", "mimetype", $file);
-  my $mimetype = do {local $/, <READER>};
-  chomp $mimetype;
-  return $mimetype;
-}
-
 # Pipe data through a command
 sub pipe2 {
   my ($cmd, $input, $in_enc, $out_enc, @args) = @_;
@@ -134,9 +86,18 @@ sub pipe2 {
   binmode(*WRITER, $out_enc);
   print WRITER $input;
   close WRITER;
-  my $output = do {local $/, <READER>};
+  my $output = slurp '<:raw', \*READER;
   waitpid $pid, 0;
   return $output;
+}
+
+# Return the MIME type of the given file
+sub getMimeType {
+  my ($file) = @_;
+  open(READER, "-|", "mimetype", $file);
+  my $mimetype = slurp \*READER;
+  chomp $mimetype;
+  return $mimetype;
 }
 
 # Convert a number to SI (3sf plus suffix)
