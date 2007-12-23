@@ -5,6 +5,9 @@
 # consider worth packaging for others (i.e. it reflects my taste,
 # laziness and ignorance more than general utility!)
 
+# FIXME: Need slurp[Text] and spew[Text] to avoid needing to remember
+# incantations.
+
 require 5.8.4;
 package RRT::Misc;
 
@@ -29,6 +32,7 @@ our @EXPORT_OK;
 
 
 # Untaint the given value
+# FIXME: Use CGI::Untaint
 sub untaint {
   my ($var) = @_;
   return if !defined($var);
