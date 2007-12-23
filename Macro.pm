@@ -1,4 +1,4 @@
-# RRT::Macro (c) 2002-2006 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Macro (c) 2002-2007 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # A simple macro expander.
