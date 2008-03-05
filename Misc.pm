@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2007 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2008 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -85,6 +85,7 @@ sub normalizePath {
 # Pipe data through a command
 sub pipe2 {
   my ($cmd, $input, $in_enc, $out_enc, @args) = @_;
+  local (*READER, *WRITER);
   my $pid = open2(*READER, *WRITER, $cmd, @args);
   binmode(*READER, $in_enc);
   binmode(*WRITER, $out_enc);
@@ -98,6 +99,7 @@ sub pipe2 {
 # Return the MIME type of the given file
 sub getMimeType {
   my ($file) = @_;
+  local *READER;
   open(READER, "-|", "mimetype", $file);
   my $mimetype = slurp \*READER;
   chomp $mimetype;
