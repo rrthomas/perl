@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2008 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2009 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -18,15 +18,16 @@ use Perl6::Slurp;
 use POSIX 'floor';
 use File::Basename;
 use IPC::Open2;
+use Cwd 'abs_path';
 
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 0.03;
+  $VERSION = 0.04;
   @ISA = qw(Exporter);
-  @EXPORT = qw(&untaint &mtime &touch &which
-               &cleanPath &normalizePath
-               &pipe2 &getMimeType &numberToSI);
+  @EXPORT = qw(&untaint &touch &which
+               &cleanPath &normalizePath &readDir &pipe2
+               &getMime &getMimeType &getMimeEncoding &numberToSI);
 }
 our @EXPORT_OK;
 
@@ -38,13 +39,6 @@ sub untaint {
   return if !defined($var);
   $var =~ /^(.*)$/ms;           # get untainted value in $1
   return $1;
-}
-
-# Return last modified time of the given object
-sub mtime {
-  my ($object) = @_;
-  return 0 if !-e $object;
-  return (stat $object)[9];
 }
 
 # Touch the given objects, which must exist
@@ -82,6 +76,23 @@ sub normalizePath {
   return $file;
 }
 
+# Return the readable non-dot files in a directory as a list
+sub readDir {
+  my ($dir, $test) = @_;
+  $test ||= sub {
+    my $file = abs_path(shift);
+    if (defined($file)) {
+      return (-f $file || -d _) && -r _;
+    } else {
+      return 0;
+    }
+  };
+  opendir(DIR, $dir) || return ();
+  my @entries = grep {/^[^.]/ && &{$test}("$dir/$_")} readdir(DIR);
+  closedir DIR;
+  return @entries;
+}
+
 # Pipe data through a command
 sub pipe2 {
   my ($cmd, $input, $in_enc, $out_enc, @args) = @_;
@@ -96,14 +107,31 @@ sub pipe2 {
   return $output;
 }
 
-# Return the MIME type of the given file
-sub getMimeType {
+# Return the MIME type, and possibly encoding, of the given file
+sub getMime {
   my ($file) = @_;
   local *READER;
   open(READER, "-|", "mimetype", $file);
   my $mimetype = slurp \*READER;
   chomp $mimetype;
   return $mimetype;
+}
+
+# Return the MIME type of the given file
+sub getMimeType {
+  my ($file) = @_;
+  my $mime = getMime($file);
+  $mime =~ s/;.*$//;
+  return $mime;
+}
+
+# Return the MIME encoding of the given file, or "binary" if none
+sub getMimeEncoding {
+  my ($file) = @_;
+  my $mime = getMime($file);
+  $mime =~ s/.*; charset=//;
+  $mime = "binary" if $mime eq "";
+  return $mime;
 }
 
 # Convert a number to SI (3sf plus suffix)
