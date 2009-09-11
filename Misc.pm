@@ -19,14 +19,14 @@ use POSIX 'floor';
 use File::Basename;
 use IPC::Open2;
 use Cwd 'abs_path';
+use Encode;
 
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 0.04;
+  $VERSION = 0.05;
   @ISA = qw(Exporter);
-  @EXPORT = qw(&untaint &touch &which
-               &cleanPath &normalizePath &readDir &pipe2
+  @EXPORT = qw(&untaint &touch &which &cleanPath &normalizePath &readDir
                &getMime &getMimeType &getMimeEncoding &numberToSI);
 }
 our @EXPORT_OK;
@@ -88,23 +88,9 @@ sub readDir {
     }
   };
   opendir(DIR, $dir) || return ();
-  my @entries = grep {/^[^.]/ && &{$test}("$dir/$_")} readdir(DIR);
+  my @entries = grep {/^[^.]/ && &{$test}(decode_utf8($dir) . "/" . decode_utf8($_))} readdir(DIR);
   closedir DIR;
   return @entries;
-}
-
-# Pipe data through a command
-sub pipe2 {
-  my ($cmd, $input, $in_enc, $out_enc, @args) = @_;
-  local (*READER, *WRITER);
-  my $pid = open2(*READER, *WRITER, $cmd, @args);
-  binmode(*READER, $in_enc);
-  binmode(*WRITER, $out_enc);
-  print WRITER $input;
-  close WRITER;
-  my $output = slurp '<:raw', \*READER;
-  waitpid $pid, 0;
-  return $output;
 }
 
 # Return the MIME type, and possibly encoding, of the given file
