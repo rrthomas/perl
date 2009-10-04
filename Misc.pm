@@ -17,7 +17,6 @@ use warnings;
 use Perl6::Slurp;
 use POSIX 'floor';
 use File::Basename;
-use IPC::Open2;
 use Cwd 'abs_path';
 use Encode;
 
