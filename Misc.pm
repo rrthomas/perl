@@ -92,6 +92,8 @@ sub readDir {
   return @entries;
 }
 
+# FIXME: Use File::LibMagic instead of next 3 subs
+
 # Return the MIME type, and possibly encoding, of the given file
 sub getMime {
   my ($file) = @_;
