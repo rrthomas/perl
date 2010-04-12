@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2009 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2010 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -20,19 +20,15 @@ use File::Basename;
 use Cwd 'abs_path';
 use Encode;
 
-BEGIN {
-  use Exporter ();
-  our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 0.05;
-  @ISA = qw(Exporter);
-  @EXPORT = qw(&untaint &touch &which &cleanPath &normalizePath &readDir
-               &getMime &getMimeType &getMimeEncoding &numberToSI);
-}
-our @EXPORT_OK;
+# FIXME: Use EXPORT_OK, explicit import in callees.
+use parent qw(Exporter);
+our $VERSION = 0.06;
+our @EXPORT = qw(untaint touch which cleanPath normalizePath
+                 attrs_get attrs_set readDir
+                 getMime getMimeType getMimeEncoding numberToSI);
 
 
 # Untaint the given value
-# FIXME: Use CGI::Untaint
 sub untaint {
   my ($var) = @_;
   return if !defined($var);
@@ -73,6 +69,27 @@ sub normalizePath {
   }
   $file =~ s|^\./||;
   return $file;
+}
+
+# Get attributes of a file
+# N.B. Treat return values as a list, don't rely on the actual values here
+# i.e. call attrs_set($file1, attrs_get($file2)), that way the
+# attributes saved can be extended without breaking the API.
+# FIXME: Support extended attributes.
+sub attrs_get {
+  my ($file) = @_;
+  my ($mode, $uid, $gid) = (stat($file))[2, 4, 5];
+  $mode = $mode & 07777;
+  return $mode, $uid, $gid;
+}
+
+# Set attributes of a file previously saved with attrs_save
+#  file: file to set attributes of
+#  ...: attributes list returned by attrs_get
+sub attrs_set {
+  my ($file, $mode, $uid, $gid) = @_;
+  chmod $mode, $file;
+  chown $uid, $gid, $file;
 }
 
 # Return the readable non-dot files in a directory as a list
