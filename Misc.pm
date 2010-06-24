@@ -21,7 +21,7 @@ use Cwd 'abs_path';
 use Encode;
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
-use parent qw(Exporter);
+use base qw(Exporter);
 our $VERSION = 0.06;
 our @EXPORT = qw(untaint touch which cleanPath normalizePath
                  attrs_get attrs_set readDir
