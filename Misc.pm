@@ -57,6 +57,7 @@ sub cleanPath {
 }
 
 # Normalize a path possibly relative to another
+# FIXME: Use built-in functions
 sub normalizePath {
   my ($file, $currentDir) = @_;
   return "" if !cleanPath($file);
