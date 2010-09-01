@@ -5,7 +5,7 @@
 # consider worth packaging for others (i.e. it reflects my taste,
 # laziness and ignorance more than general utility!)
 
-# FIXME: Need slurpText and spew[Text] to avoid needing to remember
+# FIXME: Need slurpText and spewText to avoid needing to remember
 # incantations.
 
 require 5.8.4;
