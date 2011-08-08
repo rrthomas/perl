@@ -116,7 +116,7 @@ sub readDir {
 sub getMime {
   my ($file) = @_;
   local *READER;
-  open(READER, "-|", "mimetype", $file);
+  open(READER, "-|", "mimeinfo", $file);
   my $mimetype = slurp \*READER;
   chomp $mimetype;
   return $mimetype;
@@ -125,9 +125,14 @@ sub getMime {
 # Return the MIME type of the given file
 sub getMimeType {
   my ($file) = @_;
-  my $mime = getMime($file);
-  $mime =~ s/;.*$//;
-  return $mime;
+  # Until https://freedesktop.org/show_bug.cgi?id=39923 is fixed, symlinks are not dereferenced, so use mimeinfo instead of xdg-mime
+  #local *READER;
+  #open(READER, "-|", "xdg-mime", "query", "filetype", $file);
+  #my $mimetype = slurp \*READER;
+  my $mimetype = getMime($file);
+  $mimetype =~ s/;.*$//; # Cope with result of getMime, or with xdg-mime using file -i (https://bugs.freedesktop.org/show_bug.cgi?id=39166)
+  #chomp $mimetype;
+  return $mimetype;
 }
 
 # Return the MIME encoding of the given file, or "binary" if none
