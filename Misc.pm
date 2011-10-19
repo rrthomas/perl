@@ -93,16 +93,13 @@ sub attrs_set {
   chown $uid, $gid, $file;
 }
 
-# Return the readable non-dot files in a directory as a list
+# Return the readable non-dot files & directories in a directory as a list
 sub readDir {
   my ($dir, $test) = @_;
   $test ||= sub {
-    my $file = abs_path(shift);
-    if (defined($file)) {
-      return (-f $file || -d _) && -r _;
-    } else {
-      return 0;
-    }
+    my $file = abs_path(shift); # FIXME: Is abs_path needed here?
+    return 0 unless defined($file);
+    return (-f $file || -d _) && -r _;
   };
   opendir(DIR, $dir) || return ();
   my @entries = grep {/^[^.]/ && &{$test}(decode_utf8($dir) . "/" . decode_utf8($_))} readdir(DIR);
