@@ -17,7 +17,6 @@ use warnings;
 use Perl6::Slurp;
 use POSIX 'floor';
 use File::Basename;
-use Cwd 'abs_path';
 use Encode;
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
@@ -96,11 +95,7 @@ sub attrs_set {
 # Return the readable non-dot files & directories in a directory as a list
 sub readDir {
   my ($dir, $test) = @_;
-  $test ||= sub {
-    my $file = abs_path(shift); # FIXME: Is abs_path needed here?
-    return 0 unless defined($file);
-    return (-f $file || -d _) && -r _;
-  };
+  $test ||= sub { return (-f shift || -d _) && -r _; };
   opendir(DIR, $dir) || return ();
   my @entries = grep {/^[^.]/ && &{$test}(decode_utf8($dir) . "/" . decode_utf8($_))} readdir(DIR);
   closedir DIR;
