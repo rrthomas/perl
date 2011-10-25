@@ -102,13 +102,11 @@ sub readDir {
   return @entries;
 }
 
-# FIXME: Use File::LibMagic instead of next 3 subs
-
 # Return the MIME type, and possibly encoding, of the given file
 sub getMime {
   my ($file) = @_;
   local *READER;
-  open(READER, "-|", "mimeinfo", $file);
+  open(READER, "-|", "file", "--mime", "--brief", "--dereference", "--exclude", "tokens", "--", $file);
   my $mimetype = slurp \*READER;
   chomp $mimetype;
   return $mimetype;
