@@ -14,10 +14,12 @@ package RRT::Misc;
 use strict;
 use warnings;
 
-use Perl6::Slurp;
 use POSIX 'floor';
 use File::Basename;
 use Encode;
+
+use Perl6::Slurp;
+
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
