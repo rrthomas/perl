@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2011 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2012 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -23,10 +23,10 @@ use Perl6::Slurp;
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
-our $VERSION = 0.06;
+our $VERSION = 0.07;
 our @EXPORT = qw(untaint touch which cleanPath normalizePath
                  attrs_get attrs_set readDir
-                 getMime getMimeType getMimeEncoding numberToSI);
+                 getMimeType getMimeEncoding numberToSI);
 
 
 # Untaint the given value
@@ -104,37 +104,28 @@ sub readDir {
   return @entries;
 }
 
-# Return the MIME type, and possibly encoding, of the given file
-sub getMime {
-  my ($file) = @_;
-  local *READER;
-  # Until https://freedesktop.org/show_bug.cgi?id=47358 is fixed, keep this, to use --brief
-  open(READER, "-|", "file", "--mime", "--brief", "--dereference", "--", $file);
-  my $mimetype = slurp \*READER;
-  chomp $mimetype;
-  return $mimetype;
-}
-
 # Return the MIME type of the given file
 sub getMimeType {
   my ($file) = @_;
-  # Until https://freedesktop.org/show_bug.cgi?id=39923 is fixed, symlinks are not dereferenced, so use getMime instead of xdg-mime
-  #local *READER;
+  local *READER;
+  # Until https://freedesktop.org/show_bug.cgi?id=39923 (use
+  # --dereference) and https://freedesktop.org/show_bug.cgi?id=47358
+  # (use --brief) are fixed, run file directly
   #open(READER, "-|", "xdg-mime", "query", "filetype", $file);
-  #my $mimetype = slurp \*READER;
-  my $mimetype = getMime($file);
-  $mimetype =~ s/;.*$//; # Cope with result of getMime, or with xdg-mime using file -i (https://bugs.freedesktop.org/show_bug.cgi?id=39166)
-  #chomp $mimetype;
+  open(READER, "-|", "file", "--mime-type", "--brief", "--dereference", "--", $file);
+  my $mimetype = slurp \*READER;
+  chomp $mimetype;
   return $mimetype;
 }
 
 # Return the MIME encoding of the given file, or "binary" if none
 sub getMimeEncoding {
   my ($file) = @_;
-  my $mime = getMime($file);
-  $mime =~ s/.*; charset=//;
-  $mime = "binary" if $mime eq "";
-  return $mime;
+  local *READER;
+  open(READER, "-|", "file", "--mime-encoding", "--brief", "--dereference", "--", $file);
+  my $encoding = slurp \*READER;
+  chomp $encoding;
+  return $encoding;
 }
 
 # Convert a number to SI (3sf plus suffix)
