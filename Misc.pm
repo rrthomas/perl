@@ -85,7 +85,7 @@ sub attrs_get {
   return $mode, $uid, $gid;
 }
 
-# Set attributes of a file previously saved with attrs_save
+# Set attributes of a file previously saved with attrs_get
 #  file: file to set attributes of
 #  ...: attributes list returned by attrs_get
 sub attrs_set {
