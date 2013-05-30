@@ -16,6 +16,7 @@ use warnings;
 
 use POSIX 'floor';
 use File::Basename;
+use File::stat;
 use Encode;
 
 use Perl6::Slurp;
@@ -80,9 +81,8 @@ sub normalizePath {
 # FIXME: Support extended attributes.
 sub attrs_get {
   my ($file) = @_;
-  my ($mode, $uid, $gid) = (stat($file))[2, 4, 5];
-  $mode = $mode & 07777;
-  return $mode, $uid, $gid;
+  my $st = stat($file);
+  return $st->mode & 07777, $st->uid, $st->gid;
 }
 
 # Set attributes of a file previously saved with attrs_get
