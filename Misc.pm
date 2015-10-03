@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2013 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2015 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -16,6 +16,7 @@ use warnings;
 
 use POSIX 'floor';
 use File::Basename;
+use Cwd 'realpath';
 use File::stat;
 use Encode;
 
@@ -58,11 +59,9 @@ sub cleanPath {
   return $path !~ m|^\.\./| && $path !~ m|/\.\.$| && $path !~ m|/\.\./|;
 }
 
-# Normalize a path possibly relative to another
-# FIXME: Use built-in functions
+# Normalize $file, possibly relative to $currentDir; restrict to $rootDir
 sub normalizePath {
-  my ($file, $currentDir) = @_;
-  return "" if !cleanPath($file);
+  my ($file, $currentDir, $rootDir) = @_;
   my $path = "";
   $path = (fileparse($currentDir))[1] if $currentDir && $currentDir ne "";
   if ($file !~ m|^/|) {
@@ -71,6 +70,8 @@ sub normalizePath {
     $file =~ s|^/||;
   }
   $file =~ s|^\./||;
+  my $realfile = realpath("$rootDir/$file");
+  return "" if $realfile !~ /^$rootDir/;
   return $file;
 }
 
