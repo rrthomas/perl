@@ -25,7 +25,7 @@ use Perl6::Slurp;
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
-our $VERSION = 0.07;
+our $VERSION = 0.08;
 our @EXPORT = qw(untaint touch which cleanPath normalizePath
                  attrs_get attrs_set readDir
                  getMimeType getMimeEncoding numberToSI);
@@ -109,9 +109,7 @@ sub readDir {
 sub getMimeType {
   my ($file) = @_;
   local *READER;
-  # Until https://freedesktop.org/show_bug.cgi?id=39923 (use
-  # --dereference) and https://freedesktop.org/show_bug.cgi?id=47358
-  # (use --brief) are fixed, run file directly
+  # Until xdg-utils 1.1.0 can be assumed (use --dereference and --brief), run file directly
   #open(READER, "-|", "xdg-mime", "query", "filetype", $file);
   open(READER, "-|", "file", "--mime-type", "--brief", "--dereference", "--", $file);
   my $mimetype = slurp \*READER;
