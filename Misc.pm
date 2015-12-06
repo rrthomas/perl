@@ -16,7 +16,6 @@ use warnings;
 
 use POSIX 'floor';
 use File::Basename;
-use Cwd 'realpath';
 use File::stat;
 use Encode;
 
@@ -26,8 +25,7 @@ use Perl6::Slurp;
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
 our $VERSION = 0.08;
-our @EXPORT = qw(untaint touch which cleanPath normalizePath
-                 attrs_get attrs_set readDir
+our @EXPORT = qw(untaint touch which attrs_get attrs_set readDir
                  getMimeType getMimeEncoding numberToSI);
 
 
@@ -50,27 +48,6 @@ sub which {
   my ($prog) = @_;
   my @progs = grep { -x $_ } map { "$_/$prog" } split(/:/, $ENV{PATH});
   return shift @progs;
-}
-
-# Check the given path is clean (no ".." components)
-sub cleanPath {
-  my ($path) = @_;
-  $path = "" if !$path;
-  return $path !~ m|^\.\./| && $path !~ m|/\.\.$| && $path !~ m|/\.\./|;
-}
-
-# If $path is not absolute, prepend the directory part of $currentDir
-# Canonicalize $path
-# If $rootDir is a prefix of the canonical $path, return the original
-# $path; otherwise, return the empty string.
-sub normalizePath {
-  my ($file, $currentDir, $rootDir) = @_;
-  $currentDir = (fileparse($currentDir))[1];
-  my $path = $file;
-  $path = "$currentDir$file" if $file !~ m|^/|;
-  my $realfile = realpath($path);
-  return "" if $realfile !~ /^$rootDir/;
-  return $file;
 }
 
 # Get attributes of a file
