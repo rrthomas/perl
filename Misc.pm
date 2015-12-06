@@ -59,18 +59,16 @@ sub cleanPath {
   return $path !~ m|^\.\./| && $path !~ m|/\.\.$| && $path !~ m|/\.\./|;
 }
 
-# Normalize $file, possibly relative to $currentDir; restrict to $rootDir
+# If $path is not absolute, prepend the directory part of $currentDir
+# Canonicalize $path
+# If $rootDir is a prefix of the canonical $path, return the original
+# $path; otherwise, return the empty string.
 sub normalizePath {
   my ($file, $currentDir, $rootDir) = @_;
-  my $path = "";
-  $path = (fileparse($currentDir))[1] if $currentDir && $currentDir ne "";
-  if ($file !~ m|^/|) {
-    $file = "$path$file";
-  } else {
-    $file =~ s|^/||;
-  }
-  $file =~ s|^\./||;
-  my $realfile = realpath("$rootDir/$file");
+  $currentDir = (fileparse($currentDir))[1];
+  my $path = $file;
+  $path = "$currentDir$file" if $file !~ m|^/|;
+  my $realfile = realpath($path);
   return "" if $realfile !~ /^$rootDir/;
   return $file;
 }
