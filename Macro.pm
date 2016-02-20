@@ -3,7 +3,7 @@
 
 # A simple macro expander.
 
-# Macros are supplied as subroutines in the hash %Macros.
+# Macros are supplied as a hash of names to subroutines.
 # A macro is invoked as $macro or $macro{arg1, arg2, ...}
 # Commas in arguments may be escaped with a backslash.
 # Unknown macros are ignored.
