@@ -43,7 +43,8 @@ sub doMacros {
 sub expand {
   my ($text, $macros) = @_;
   $text = doMacros($text, $macros);
-  $text =~ s/(?!<\\)\$([[:upper:]])/\$\l$1/g; # Convert $Macro back to $macro
+  # Convert `$Macro' back to `$macro'
+  $text =~ s/(?!<\\)(?<=\$)([[:upper:]])(?=[[:lower:]]*)/lc($1)/ge;
   return $text;
 }
 
