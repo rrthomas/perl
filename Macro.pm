@@ -23,13 +23,10 @@ BEGIN {
 }
 our @EXPORT_OK;
 
-# Macros (supplied by caller)
-use vars qw(%Macros);
-
 sub doMacro {
-  my ($macro, $arg) = @_;
+  my ($macro, $arg, $Macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
-  return $Macros{$macro}(@arg) if $Macros{$macro};
+  return $Macros->{$macro}(@arg) if defined($Macros->{$macro});
   $macro =~ s/^(.)/\u$1/; # Convert unknown $macro to $Macro
   my $ret = "\$$macro";
   $ret .= "{$arg}" if $arg;
@@ -37,10 +34,9 @@ sub doMacro {
 }
 
 sub doMacros {
-  my ($text) = shift;
-  %Macros = %{shift()};
-  1 while (($text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1)/ge) || # macros without arguments
-           ($text =~ s/\$([[:lower:]]+){(((?:(?!(?<!\\)[{}])).)*?)(?<!\\)}/doMacro($1, $2)/ge)); # macros with arguments
+  my ($text, $macros) = @_;
+  1 while (($text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, "", $macros)/ge) || # macros without arguments
+           ($text =~ s/\$([[:lower:]]+){(((?:(?!(?<!\\)[{}])).)*?)(?<!\\)}/doMacro($1, $2, $macros)/ge)); # macros with arguments
   return $text;
 }
 
