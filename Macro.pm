@@ -1,4 +1,4 @@
-# RRT::Macro (c) 2002-2008 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Macro (c) 2002-2016 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # A simple macro expander.
@@ -29,8 +29,6 @@ use vars qw(%Macros);
 sub doMacro {
   my ($macro, $arg) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
-  # FIXME: The next line is Smut/DarkGlass-specific
-  map { s/&#(\pN+);/chr($1)/ge; $_ } @arg; # Turn entities into characters
   return $Macros{$macro}(@arg) if $Macros{$macro};
   $macro =~ s/^(.)/\u$1/; # Convert unknown $macro to $Macro
   my $ret = "\$$macro";
