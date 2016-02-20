@@ -29,13 +29,13 @@ sub doMacro {
   return $Macros->{$macro}(@arg) if defined($Macros->{$macro});
   $macro =~ s/^(.)/\u$1/; # Convert unknown $macro to $Macro
   my $ret = "\$$macro";
-  $ret .= "{$arg}" if $arg;
+  $ret .= "{$arg}" if defined($arg);
   return $ret;
 }
 
 sub doMacros {
   my ($text, $macros) = @_;
-  1 while (($text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, "", $macros)/ge) || # macros without arguments
+  1 while (($text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge) || # macros without arguments
            ($text =~ s/\$([[:lower:]]+){(((?:(?!(?<!\\)[{}])).)*?)(?<!\\)}/doMacro($1, $2, $macros)/ge)); # macros with arguments
   return $text;
 }
