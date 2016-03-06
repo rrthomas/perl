@@ -17,16 +17,16 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 0.01;
+  $VERSION = 1.00;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
 our @EXPORT_OK;
 
 sub doMacro {
-  my ($macro, $arg, $Macros) = @_;
+  my ($macro, $arg, $macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
-  return $Macros->{$macro}(@arg) if defined($Macros->{$macro});
+  return expand($macros->{$macro}(@arg), $macros) if defined($macros->{$macro});
   $macro =~ s/^(.)/\u$1/; # Convert unknown $macro to $Macro
   my $ret = "\$$macro";
   $ret .= "{$arg}" if defined($arg);
