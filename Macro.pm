@@ -26,25 +26,19 @@ our @EXPORT_OK;
 sub doMacro {
   my ($macro, $arg, $macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
+  for (my $i = 0; $i < $#arg; $i++) {
+    $arg[$i] = expand($arg[$i]);
+  }
   return expand($macros->{$macro}(@arg), $macros) if defined($macros->{$macro});
-  $macro =~ s/^(.)/\u$1/; # Convert unknown $macro to $Macro
   my $ret = "\$$macro";
   $ret .= "{$arg}" if defined($arg);
   return $ret;
 }
 
-sub doMacros {
-  my ($text, $macros) = @_;
-  1 while (($text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge) || # macros without arguments
-           ($text =~ s/\$([[:lower:]]+){(((?:(?!(?<!\\)[{}])).)*?)(?<!\\)}/doMacro($1, $2, $macros)/ge)); # macros with arguments
-  return $text;
-}
-
 sub expand {
   my ($text, $macros) = @_;
-  $text = doMacros($text, $macros);
-  # Convert `$Macro' back to `$macro'
-  $text =~ s/(?!<\\)(?<=\$)([[:upper:]])(?=[[:lower:]]*)/lc($1)/ge;
+  $text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge; # macros without arguments
+  $text =~ s/\$([[:lower:]]+){(((?:(?!(?<!\\)[{}])).)*?)(?<!\\)}/doMacro($1, $2, $macros)/ge; # macros with arguments
   return $text;
 }
 
