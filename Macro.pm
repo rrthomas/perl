@@ -7,6 +7,10 @@
 # A macro is invoked as $macro or $macro{arg1, arg2, ...}
 # Commas in arguments may be escaped with a backslash.
 # Unknown macros are ignored.
+# Arguments are expanded before the macro is called.
+# A macro returns two results: the first is its expansion. If the second
+# return value is false, the result is itself expanded before being
+# returned.
 
 require 5.8.4;
 package RRT::Macro;
@@ -17,7 +21,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 1.00;
+  $VERSION = 2.00;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -29,7 +33,11 @@ sub doMacro {
   for (my $i = 0; $i < $#arg; $i++) {
     $arg[$i] = expand($arg[$i]);
   }
-  return expand($macros->{$macro}(@arg), $macros) if defined($macros->{$macro});
+  if (defined($macros->{$macro})) {
+    my ($ret, $stop) = $macros->{$macro}(@arg);
+    $ret = expand($ret, $macros) unless $stop;
+    return $ret;
+  }
   my $ret = "\$$macro";
   $ret .= "{$arg}" if defined($arg);
   return $ret;
