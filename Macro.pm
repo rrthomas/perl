@@ -8,8 +8,8 @@
 # Commas in arguments may be escaped with a backslash.
 # Unknown macros are ignored.
 # Arguments are expanded before the macro is called.
-# A macro returns two results: the first is its expansion. If the second
-# return value is false, the result is itself expanded before being
+# A macro returns two results: the first is its expansion; if the second
+# return value is true, the result is itself expanded before being
 # returned.
 
 require 5.8.4;
@@ -21,7 +21,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 2.00;
+  $VERSION = 3.00;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -34,8 +34,8 @@ sub doMacro {
     $arg[$i] = expand($arg[$i]);
   }
   if (defined($macros->{$macro})) {
-    my ($ret, $stop) = $macros->{$macro}(@arg);
-    $ret = expand($ret, $macros) unless $stop;
+    my ($ret, $continue) = $macros->{$macro}(@arg);
+    $ret = expand($ret, $macros) if $continue;
     return $ret;
   }
   my $ret = "\$$macro";
