@@ -19,7 +19,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.10;
+  $VERSION = 3.11;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -29,6 +29,7 @@ sub doMacro {
   my ($macro, $arg, $macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
   for (my $i = 0; $i < $#arg; $i++) {
+    $arg[$i] =~ s/\\,/,/; # Remove escaping backslashes
     $arg[$i] = expand($arg[$i]);
   }
   return $macros->{$macro}(@arg) if defined($macros->{$macro});
@@ -39,6 +40,7 @@ sub doMacro {
 
 sub expand {
   my ($text, $macros) = @_;
+  # FIXME: Allow other (all printable non-{?) characters in macro names
   $text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge; # macros without arguments
   $text =~ s/\$([[:lower:]]+){(((?:(?!(?<!\\)[{}])).)*?)(?<!\\)}/doMacro($1, $2, $macros)/ge; # macros with arguments
   return $text;
