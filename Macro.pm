@@ -10,7 +10,7 @@
 # Arguments are expanded before the macro is called.
 # A macro returns its expansion.
 
-require 5.8.4;
+require 5.10.0;
 package RRT::Macro;
 
 use strict;
@@ -19,7 +19,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.11;
+  $VERSION = 3.12;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -42,7 +42,7 @@ sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
   $text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge; # macros without arguments
-  $text =~ s/\$([[:lower:]]+){(((?:(?!(?<!\\)[{}])).)*?)(?<!\\)}/doMacro($1, $2, $macros)/ge; # macros with arguments
+  $text =~ s/\$([[:lower:]]+)({((?:(?>[^{}]+)|(?2))*)})/doMacro($1, $3, $macros)/ge; # macros with arguments
   return $text;
 }
 
