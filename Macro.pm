@@ -19,7 +19,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.12;
+  $VERSION = 3.13;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -28,9 +28,9 @@ our @EXPORT_OK;
 sub doMacro {
   my ($macro, $arg, $macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
-  for (my $i = 0; $i < $#arg; $i++) {
+  for (my $i = 0; $i <= $#arg; $i++) {
     $arg[$i] =~ s/\\,/,/; # Remove escaping backslashes
-    $arg[$i] = expand($arg[$i]);
+    $arg[$i] = expand($arg[$i], $macros);
   }
   return $macros->{$macro}(@arg) if defined($macros->{$macro});
   my $ret = "\$$macro";
