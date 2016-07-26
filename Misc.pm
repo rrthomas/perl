@@ -84,9 +84,7 @@ sub readDir {
 sub getMimeType {
   my ($file) = @_;
   local *READER;
-  # Until xdg-utils 1.1.0 can be assumed (use --dereference and --brief), run file directly
-  #open(READER, "-|", "xdg-mime", "query", "filetype", $file);
-  open(READER, "-|", "file", "--mime-type", "--brief", "--dereference", "--", $file);
+  open(READER, "-|", "xdg-mime", "query", "filetype", $file);
   my $mimetype = slurp \*READER;
   chomp $mimetype;
   return $mimetype;
