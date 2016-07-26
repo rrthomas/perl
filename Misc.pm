@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2015 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2016 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
