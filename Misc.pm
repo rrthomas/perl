@@ -24,8 +24,8 @@ use Perl6::Slurp;
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
-our $VERSION = 0.08;
-our @EXPORT = qw(untaint touch which attrs_get attrs_set readDir
+our $VERSION = 0.09;
+our @EXPORT = qw(untaint touch attrs_get attrs_set readDir
                  getMimeType getMimeEncoding numberToSI);
 
 
@@ -41,13 +41,6 @@ sub untaint {
 sub touch {
   my $now = time;
   utime $now, $now, @_;
-}
-
-# Find an executable on the PATH
-sub which {
-  my ($prog) = @_;
-  my @progs = grep { -x $_ } map { "$_/$prog" } split(/:/, $ENV{PATH});
-  return shift @progs;
 }
 
 # Get attributes of a file
