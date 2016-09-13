@@ -5,9 +5,6 @@
 # consider worth packaging for others (i.e. it reflects my taste,
 # laziness and ignorance more than general utility!)
 
-# FIXME: Need slurpText and spewText to avoid needing to remember
-# incantations.
-
 require 5.8.4;
 package RRT::Misc;
 
@@ -19,7 +16,7 @@ use File::Basename;
 use File::stat;
 use Encode;
 
-use Perl6::Slurp;
+use File::Slurp qw(slurp);
 
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
@@ -78,7 +75,7 @@ sub getMimeType {
   my ($file) = @_;
   local *READER;
   open(READER, "-|", "xdg-mime", "query", "filetype", $file);
-  my $mimetype = slurp \*READER;
+  my $mimetype = slurp(\*READER);
   chomp $mimetype;
   return $mimetype;
 }
@@ -88,7 +85,7 @@ sub getMimeEncoding {
   my ($file) = @_;
   local *READER;
   open(READER, "-|", "file", "--mime-encoding", "--brief", "--dereference", "--", $file);
-  my $encoding = slurp \*READER;
+  my $encoding = slurp(\*READER);
   chomp $encoding;
   return $encoding;
 }
