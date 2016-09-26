@@ -38,6 +38,8 @@ sub doMacro {
   return $ret;
 }
 
+# FIXME: Allow syntax to be redefined; e.g. use XML syntax: <[namespace:]include file="" />
+# Use this in Nancy
 sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
