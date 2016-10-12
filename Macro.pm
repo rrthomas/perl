@@ -19,7 +19,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.13;
+  $VERSION = 3.14;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -44,7 +44,7 @@ sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
   $text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge; # macros without arguments
-  $text =~ s/\$([[:lower:]]+)({((?:(?>[^{}]+)|(?2))*)})/doMacro($1, $3, $macros)/ge; # macros with arguments
+  $text =~ s/\$([[:lower:]]+)({((?:[^{}]++|(?2))*)})/doMacro($1, $3, $macros)/ge; # macros with arguments
   return $text;
 }
 
