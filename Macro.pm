@@ -5,6 +5,7 @@
 
 # Macros are supplied as a hash of names to subroutines.
 # A macro is invoked as $macro or $macro{arg1, arg2, ...}
+# Macros may be escaped by putting a backslash before the dollar.
 # Commas in arguments may be escaped with a backslash.
 # Unknown macros are ignored.
 # Arguments are expanded before the macro is called.
@@ -19,7 +20,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.14;
+  $VERSION = 3.15;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -43,8 +44,9 @@ sub doMacro {
 sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
-  $text =~ s/\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge; # macros without arguments
-  $text =~ s/\$([[:lower:]]+)({((?:[^{}]++|(?2))*)})/doMacro($1, $3, $macros)/ge; # macros with arguments
+  $text =~ s/(?<!\\)\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge; # macros without arguments
+  $text =~ s/(?<!\\)\$([[:lower:]]+)({((?:[^{}]++|(?2))*)})/doMacro($1, $3, $macros)/ge; # macros with arguments
+  $text =~ s/\\(\$[[:lower:]]+{?)/$1/g; # escaped macros
   return $text;
 }
 
