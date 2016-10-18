@@ -20,20 +20,20 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.15;
+  $VERSION = 3.16;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
 our @EXPORT_OK;
 
 sub doMacro {
-  my ($macro, $arg, $macros) = @_;
+  my ($escaped, $macro, $arg, $macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
   for (my $i = 0; $i <= $#arg; $i++) {
     $arg[$i] =~ s/\\,/,/; # Remove escaping backslashes
     $arg[$i] = expand($arg[$i], $macros);
   }
-  return $macros->{$macro}(@arg) if defined($macros->{$macro});
+  return $macros->{$macro}(@arg) if !$escaped && defined($macros->{$macro});
   my $ret = "\$$macro";
   $ret .= "{$arg}" if defined($arg);
   return $ret;
@@ -44,10 +44,7 @@ sub doMacro {
 sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
-  $text =~ s/(?<!\\)\$([[:lower:]]+)(?![[:lower:]{])/doMacro($1, undef, $macros)/ge; # macros without arguments
-  $text =~ s/(?<!\\)\$([[:lower:]]+)({((?:[^{}]++|(?2))*)})/doMacro($1, $3, $macros)/ge; # macros with arguments
-  $text =~ s/\\(\$[[:lower:]]+{?)/$1/g; # escaped macros
-  return $text;
+  return $text =~ s/(\\)?\$([[:lower:]]+)({((?:[^{}]++|(?3))*)})?/doMacro($1, $2, $4, $macros)/ger;
 }
 
 
