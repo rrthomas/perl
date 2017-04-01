@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2016 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2017 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -14,14 +14,13 @@ use warnings;
 use POSIX 'floor';
 use File::Basename;
 use File::stat;
-use Encode;
 
 use File::Slurp qw(slurp);
 
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
-our $VERSION = 0.09;
+our $VERSION = 0.10;
 our @EXPORT = qw(untaint touch attrs_get attrs_set readDir
                  getMimeType getMimeEncoding numberToSI);
 
@@ -65,7 +64,7 @@ sub readDir {
   my ($dir, $test) = @_;
   $test ||= sub { return (-f shift || -d _) && -r _; };
   opendir(DIR, $dir) || return ();
-  my @entries = grep {/^[^.]/ && &{$test}(decode_utf8($dir) . "/" . decode_utf8($_))} readdir(DIR);
+  my @entries = grep {/^[^.]/ && &{$test}($dir . "/" . $_)} readdir(DIR);
   closedir DIR;
   return @entries;
 }
