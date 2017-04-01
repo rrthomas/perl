@@ -1,6 +1,6 @@
 # RRT Perl Modules
 
-© 2002–2016 Reuben Thomas <rrt@sc3d.org>
+© 2002–2017 Reuben Thomas <rrt@sc3d.org>
 https://github.com/rrthomas/perl
 
 A collection of miscellaneous Perl modules that I use in my own code. Maybe one day I’ll work out how to publish them on CPAN.
