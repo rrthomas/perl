@@ -1,4 +1,4 @@
-# RRT::Macro (c) 2002-2016 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Macro (c) 2002-2017 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # A simple macro expander.
@@ -30,7 +30,7 @@ sub doMacro {
   my ($escaped, $macro, $arg, $macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
   for (my $i = 0; $i <= $#arg; $i++) {
-    $arg[$i] =~ s/\\,/,/; # Remove escaping backslashes
+    $arg[$i] =~ s/\\,/,/g; # Remove escaping backslashes
     $arg[$i] = expand($arg[$i], $macros);
   }
   return $macros->{$macro}(@arg) if !$escaped && defined($macros->{$macro});
