@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2017 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Misc (c) 2003-2018 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -16,11 +16,12 @@ use File::Basename;
 use File::stat;
 
 use File::Slurp qw(slurp);
+use File::LibMagic;
 
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
-our $VERSION = 0.10;
+our $VERSION = 0.11;
 our @EXPORT = qw(untaint touch attrs_get attrs_set readDir
                  getMimeType getMimeEncoding numberToSI);
 
@@ -80,13 +81,10 @@ sub getMimeType {
 }
 
 # Return the MIME encoding of the given file, or "binary" if none
+my $magic = File::LibMagic->new(follow_symlinks => 1);
 sub getMimeEncoding {
   my ($file) = @_;
-  local *READER;
-  open(READER, "-|", "file", "--mime-encoding", "--brief", "--dereference", "--", $file);
-  my $encoding = slurp(\*READER);
-  chomp $encoding;
-  return $encoding;
+  return $magic->info_from_filename($file)->{encoding};
 }
 
 # Convert a number to SI (3sf plus suffix)
