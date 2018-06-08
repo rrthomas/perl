@@ -16,14 +16,13 @@ use File::Basename;
 use File::stat;
 
 use File::Slurp qw(slurp);
-use File::LibMagic;
 
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
 our $VERSION = 0.11;
 our @EXPORT = qw(untaint touch attrs_get attrs_set readDir
-                 getMimeType getMimeEncoding numberToSI);
+                 getMimeType numberToSI);
 
 
 # Untaint the given value
@@ -78,13 +77,6 @@ sub getMimeType {
   my $mimetype = slurp(\*READER);
   chomp $mimetype;
   return $mimetype;
-}
-
-# Return the MIME encoding of the given file, or "binary" if none
-my $magic = File::LibMagic->new(follow_symlinks => 1);
-sub getMimeEncoding {
-  my ($file) = @_;
-  return $magic->info_from_filename($file)->{encoding};
 }
 
 # Convert a number to SI (3sf plus suffix)
