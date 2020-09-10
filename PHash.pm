@@ -1,4 +1,4 @@
-# PHash (c) 2003 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# PHash (c) 2003 Reuben Thomas
 # Distributed under the GNU General Public License
 
 # Persistent arrays: stores hashes as text files using Data::Dumper

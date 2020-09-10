@@ -1,4 +1,4 @@
-# RRT::RevHistory (c) 2003 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::RevHistory (c) 2003 Reuben Thomas
 # Distributed under the GNU General Public License
 
 require 5.003;
