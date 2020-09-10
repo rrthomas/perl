@@ -1,4 +1,4 @@
-# RRT::Macro (c) 2002-2017 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Macro (c) 2002-2020 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # A simple macro expander.
@@ -20,7 +20,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.16;
+  $VERSION = 3.17;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -44,7 +44,7 @@ sub doMacro {
 sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
-  return $text =~ s/(\\)?\$([[:lower:]]+)({((?:[^{}]++|(?3))*)})?/doMacro($1, $2, $4, $macros)/ger;
+  return $text =~ s/(\\)?\$([[:lower:]]+)(\{((?:[^{}]++|(?3))*)})?/doMacro($1, $2, $4, $macros)/ger;
 }
 
 
