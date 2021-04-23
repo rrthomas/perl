@@ -1,4 +1,4 @@
-# RRT::Macro (c) 2002-2020 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
+# RRT::Macro (c) 2002-2021 Reuben Thomas (rrt@sc3d.org; http://rrt.sc3d.org)
 # Distributed under the GNU General Public License
 
 # A simple macro expander.
@@ -20,20 +20,20 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.17;
+  $VERSION = 3.18;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
 our @EXPORT_OK;
 
 sub doMacro {
-  my ($escaped, $macro, $arg, $macros) = @_;
+  my ($macro, $arg, $macros) = @_;
   my @arg = split /(?<!\\),/, ($arg || "");
   for (my $i = 0; $i <= $#arg; $i++) {
     $arg[$i] =~ s/\\,/,/g; # Remove escaping backslashes
     $arg[$i] = expand($arg[$i], $macros);
   }
-  return $macros->{$macro}(@arg) if !$escaped && defined($macros->{$macro});
+  return $macros->{$macro}(@arg) if defined($macros->{$macro});
   my $ret = "\$$macro";
   $ret .= "{$arg}" if defined($arg);
   return $ret;
@@ -44,9 +44,8 @@ sub doMacro {
 sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
-  return $text =~ s/(\\)?\$([[:lower:]]+)(\{((?:[^{}]++|(?3))*)})?/doMacro($1, $2, $4, $macros)/ger;
+  return $text =~ s/(\\?)\$([[:lower:]]+)(\{((?:[^{}]++|(?3))*)})?/$1 ? "\$$2" . ($3 ? $3 : "") : doMacro($2, $4, $macros)/ger;
 }
-
 
 
 1;                              # return a true value
