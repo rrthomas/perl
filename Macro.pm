@@ -20,7 +20,7 @@ use warnings;
 BEGIN {
   use Exporter ();
   our ($VERSION, @ISA, @EXPORT, @EXPORT_OK);
-  $VERSION = 3.18;
+  $VERSION = 3.19;
   @ISA = qw(Exporter);
   @EXPORT = qw(&expand);
 }
@@ -44,7 +44,10 @@ sub doMacro {
 sub expand {
   my ($text, $macros) = @_;
   # FIXME: Allow other (all printable non-{?) characters in macro names
-  return $text =~ s/(\\?)\$([[:lower:]]+)(\{((?:[^{}]++|(?3))*)})?/$1 ? "\$$2" . ($3 ? $3 : "") : doMacro($2, $4, $macros)/ger;
+  # Note: Writing the next line as "return $text =~ s/.../.../ger" causes
+  # Perl (up to at least 5.30) to panic with some inputs.
+  $text =~ s/(\\?)\$([[:lower:]]+)(\{((?:[^{}]++|(?3))*)})?/$1 ? "\$$2" . ($3 ? $3 : "") : doMacro($2, $4, $macros)/ge;
+  return $text;
 }
 
 
