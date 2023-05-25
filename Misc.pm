@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2018 Reuben Thomas
+# RRT::Misc (c) 2003-2023 Reuben Thomas
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -14,13 +14,14 @@ use warnings;
 use POSIX 'floor';
 use File::Basename;
 use File::stat;
+use Encode;
 
 use File::Slurp qw(slurp);
 
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
-our $VERSION = 0.11;
+our $VERSION = 0.12;
 our @EXPORT = qw(untaint touch attrs_get attrs_set readDir
                  getMimeType numberToSI);
 
@@ -64,15 +65,18 @@ sub readDir {
   my ($dir, $test) = @_;
   $test ||= sub { return (-f shift || -d _) && -r _; };
   opendir(DIR, $dir) || return ();
-  my @entries = grep {/^[^.]/ && &{$test}($dir . "/" . $_)} readdir(DIR);
+  my @entries = map { decode_utf8($_) } readdir(DIR);
+  @entries = grep {/^[^.]/ && &{$test}($dir . "/" . $_)} @entries;
   closedir DIR;
   return @entries;
 }
 
 # Return the MIME type of the given file
+# FIXME: Need to be in a UTF-8 locale for this to work!
 sub getMimeType {
   my ($file) = @_;
   local *READER;
+  $file = encode_utf8($file); # FIXME: assumes file system is UTF-8-encoded
   open(READER, "-|", "xdg-mime", "query", "filetype", $file);
   my $mimetype = slurp(\*READER);
   chomp $mimetype;
