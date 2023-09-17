@@ -13,12 +13,12 @@ use Tie::Array;
 use Data::Dumper;
 $Data::Dumper::Terse = 1;       # Store array as simple expression, not assignment
 $Data::Dumper::Indent = 1;      # Be reasonably brief
-use RRT::Misc;
+use File::Slurp qw(read_file write_file);
 
 
 sub TIEARRAY {
   my ($class, $file) = @_;
-  my $val = eval(untaint(readFile($file)) || "[]");
+  my $val = eval(untaint(read_file($file)) || "[]");
   return bless {
     FILE => $file,
     ARRAY => $val,
@@ -62,6 +62,6 @@ sub DESTROY {
 
 sub UNTIE {
   my ($self) = @_;
-  writeFile($self->{FILE}, Dumper($self->{ARRAY}));
+  write_file($self->{FILE}, Dumper($self->{ARRAY}));
   undef $self->{ARRAY};
 }
