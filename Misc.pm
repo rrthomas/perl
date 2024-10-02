@@ -1,4 +1,4 @@
-# RRT::Misc (c) 2003-2023 Reuben Thomas
+# RRT::Misc (c) 2003-2024 Reuben Thomas
 # Distributed under the GNU General Public License
 
 # This module contains various misc code that I reuse, but don't
@@ -19,7 +19,7 @@ use File::Slurp qw(slurp);
 
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
-our $VERSION = 0.12;
+our $VERSION = 0.13;
 our @EXPORT = qw(untaint touch readDir getMimeType numberToSI);
 
 
