@@ -12,7 +12,6 @@ use strict;
 use warnings;
 
 use POSIX 'floor';
-use File::Basename;
 use Encode;
 
 use File::Slurp qw(slurp);
