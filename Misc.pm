@@ -13,7 +13,6 @@ use warnings;
 
 use POSIX 'floor';
 use File::Basename;
-use File::stat;
 use Encode;
 
 use File::Slurp qw(slurp);
@@ -22,8 +21,7 @@ use File::Slurp qw(slurp);
 # FIXME: Use EXPORT_OK, explicit import in callees.
 use base qw(Exporter);
 our $VERSION = 0.12;
-our @EXPORT = qw(untaint touch attrs_get attrs_set readDir
-                 getMimeType numberToSI);
+our @EXPORT = qw(untaint touch readDir getMimeType numberToSI);
 
 
 # Untaint the given value
@@ -38,26 +36,6 @@ sub untaint {
 sub touch {
   my $now = time;
   utime $now, $now, @_;
-}
-
-# Get attributes of a file
-# N.B. Treat return values as a list, don't rely on the actual values here
-# i.e. call attrs_set($file1, attrs_get($file2)), that way the
-# attributes saved can be extended without breaking the API.
-# FIXME: Support extended attributes.
-sub attrs_get {
-  my ($file) = @_;
-  my $st = stat($file);
-  return $st->mode & 07777, $st->uid, $st->gid;
-}
-
-# Set attributes of a file previously saved with attrs_get
-#  file: file to set attributes of
-#  ...: attributes list returned by attrs_get
-sub attrs_set {
-  my ($file, $mode, $uid, $gid) = @_;
-  chmod $mode, $file;
-  chown $uid, $gid, $file;
 }
 
 # Return the readable non-dot files & directories in a directory as a list
